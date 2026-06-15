@@ -746,6 +746,17 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
 .gsub{margin:7px 0 2px;padding:7px 10px;background:#ffffff08;border-radius:8px;border-left:2px solid #5BA3F555}
 .gsubh{font-size:10.5px;font-weight:700;color:#9fcdfb;display:flex;align-items:center;gap:5px;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
 .gsubi{font-size:11.5px;color:var(--muted);line-height:1.55;padding:1px 0}
+/* ---- cleaner card layout (vertical · 2026-06-16) ---- */
+.goal.gcard{display:block;padding:15px 17px;border:1px solid var(--line);margin-bottom:11px}
+.gc-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:9px}
+.gc-top .gbu{margin-top:2px;flex:0 0 auto}
+.gc-top .gtitle{flex:1;font-size:14px;font-weight:600;line-height:1.42;color:#eef6f2}
+.gc-pct{font-size:18px;font-weight:800;white-space:nowrap;line-height:1.1;flex:0 0 auto}
+.goal.gcard .gbadges{margin:0 0 9px}
+.goal.gcard .gtag{font-size:10px;padding:2px 9px;opacity:.95}
+.goal.gcard .gmeta{margin:0 0 2px;gap:5px;font-size:12px}
+.goal.gcard .gmeta .row{align-items:flex-start;line-height:1.45}
+.goal.gcard .gprogbar{margin-top:12px;height:6px}
 /* ---- mobile polish (phone · WhatsApp/mobile browser) ---- */
 @media(max-width:600px){
   /* tabs: single swipeable row instead of wrapping into many rows */
@@ -999,12 +1010,16 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
       var sub='';
       if(g.subplan_lo){var steps=String(g.subplan_lo).split(/\s+·\s+/).map(function(s){return s.trim();}).filter(Boolean);
         sub='<div class="gsub"><div class="gsubh">'+SVG.layers(11)+' '+(EN()?'Sub-plan':'ແຜນຍ່ອຍ')+'</div>'+steps.map(function(s){return '<div class="gsubi">• '+s+'</div>';}).join('')+'</div>';}
-      return '<div class="goal gcard"><span class="gbu" style="background:'+c+'22;color:'+c+'">'+m.n+'</span>'
-        +'<div class="ginfo"><div class="gbadges"><span class="gtag '+pri.toLowerCase()+'">'+SVG.flag(11)+' '+pri+'</span>'+theme+st+'</div>'
-        +'<div class="gtitle">'+gx(g,'goal')+'</div>'
-        +'<div class="gmeta">'+deliv+'<div class="row"><span class="ic">'+SVG.user(13)+'</span><span>'+gx(g,'owner')+'</span></div></div>'+sub+'</div>'
-        +'<div class="gkpi"><span class="ic">'+SVG.target(13)+'</span>KPI: <b>'+gx(g,'kpi')+'</b></div>'
-        +'<div class="gprog"><div class="gpt"><span>'+t('ความคืบหน้า')+'</span><b>'+(planned?'—':g.progress+'%')+'</b></div><div class="gprogbar"><i style="width:'+(planned?4:g.progress)+'%;background:'+col+'"></i></div></div></div>';
+      return '<div class="goal gcard">'
+        +'<div class="gc-top"><span class="gbu" style="background:'+c+'22;color:'+c+'">'+m.n+'</span>'
+          +'<div class="gtitle">'+gx(g,'goal')+'</div>'
+          +'<span class="gc-pct" style="color:'+col+'">'+(planned?'—':g.progress+'%')+'</span></div>'
+        +'<div class="gbadges"><span class="gtag '+pri.toLowerCase()+'">'+SVG.flag(11)+' '+pri+'</span>'+theme+st+'</div>'
+        +'<div class="gmeta">'+deliv
+          +'<div class="row"><span class="ic">'+SVG.user(13)+'</span><span>'+gx(g,'owner')+'</span></div>'
+          +'<div class="row"><span class="ic">'+SVG.target(13)+'</span><span>KPI: <b style="color:#cfe7df">'+gx(g,'kpi')+'</b></span></div></div>'
+        +sub
+        +'<div class="gprogbar"><i style="width:'+(planned?4:g.progress)+'%;background:'+col+'"></i></div></div>';
     }).join('')||'<div class="note">'+t('ยังไม่มีข้อมูล (รอบันทึก)')+'</div>';
     var live=window._goalsLive,done=window._goalsDone;
     document.getElementById('goalsNote').innerHTML='<b style="color:'+(live?'#7df0bf':'var(--muted)')+'">'+(live?(EN()?'● LIVE':'● ສົດ'):(EN()?'snapshot':'ສະບັບສຳຮອງ'))+'</b> — '+(EN()?'Source: Google Sheet ':'ແຫຼ່ງ: Google Sheet ')+'<b>Data Report Go+</b> · '+(EN()?'tab ':'ແທັບ ')+'<b>Action_Goals</b>'+(live?'':(done?(EN()?' (live fetch failed — embedded copy)':' (ດຶງສົດບໍ່ໄດ້ — ສະບັບຝັງ)'):(EN()?' · loading…':' · ກຳລັງໂຫຼດ…')));
@@ -1031,12 +1046,14 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
       var sc=projColor(p.status),pu=String(p.priority||'').toUpperCase(),pr=(pu.indexOf('P1')>=0?'p1':pu.indexOf('P3')>=0?'p3':'p2');
       var steps=p.next?String(p.next).split(/\s+·\s+/).map(function(s){return s.trim();}).filter(Boolean):[];
       var nx=steps.length?'<div class="gsub"><div class="gsubh">'+SVG.flag(11)+' '+(EN()?'Next':'ກ້າວຕໍ່ໄປ')+'</div>'+steps.map(function(s){return '<div class="gsubi">• '+s+'</div>';}).join('')+'</div>':'';
-      return '<div class="goal gcard"><span class="gbu" style="background:'+sc+'22;color:'+sc+'">'+(p.cat||'')+'</span>'
-        +'<div class="ginfo"><div class="gbadges">'+(p.priority?'<span class="gtag '+pr+'">'+SVG.flag(11)+' '+p.priority+'</span>':'')+'<span class="gtag" style="background:'+sc+'22;color:'+sc+'">'+(p.status||'')+'</span>'+(p.phase?'<span class="gtag theme">'+p.phase+'</span>':'')+'</div>'
-        +'<div class="gtitle">'+(p.name||'')+'</div>'
-        +'<div class="gmeta">'+(p.obj?'<div class="row"><span class="ic">'+SVG.target(13)+'</span><span>'+p.obj+'</span></div>':'')+((p.owner||p.target)?'<div class="row"><span class="ic">'+SVG.user(13)+'</span><span>'+[p.owner,p.target].filter(Boolean).join(' · ')+'</span></div>':'')+'</div>'+nx+'</div>'
-        +'<div class="gkpi">'+(p.note?'<span class="ic">'+SVG.box(13)+'</span>'+p.note:'')+'</div>'
-        +'<div class="gprog"><div class="gpt"><span>'+t('ความคืบหน้า')+'</span><b>'+p.progress+'%</b></div><div class="gprogbar"><i style="width:'+p.progress+'%;background:'+sc+'"></i></div></div></div>';
+      return '<div class="goal gcard">'
+        +'<div class="gc-top"><span class="gbu" style="background:'+sc+'22;color:'+sc+'">'+(p.cat||'')+'</span>'
+          +'<div class="gtitle">'+(p.name||'')+'</div>'
+          +'<span class="gc-pct" style="color:'+sc+'">'+p.progress+'%</span></div>'
+        +'<div class="gbadges">'+(p.priority?'<span class="gtag '+pr+'">'+SVG.flag(11)+' '+p.priority+'</span>':'')+'<span class="gtag" style="background:'+sc+'22;color:'+sc+'">'+(p.status||'')+'</span>'+(p.phase?'<span class="gtag theme">'+p.phase+'</span>':'')+'</div>'
+        +'<div class="gmeta">'+(p.obj?'<div class="row"><span class="ic">'+SVG.target(13)+'</span><span>'+p.obj+'</span></div>':'')+((p.owner||p.target)?'<div class="row"><span class="ic">'+SVG.user(13)+'</span><span>'+[p.owner,p.target].filter(Boolean).join(' · ')+'</span></div>':'')+(p.note?'<div class="row"><span class="ic">'+SVG.box(13)+'</span><span style="opacity:.85">'+p.note+'</span></div>':'')+'</div>'
+        +nx
+        +'<div class="gprogbar"><i style="width:'+p.progress+'%;background:'+sc+'"></i></div></div>';
     }).join('')||'<div class="note">—</div>';
     var live=window._projLive,done=window._projDone;
     document.getElementById('projectsNote').innerHTML='<b style="color:'+(live?'#7df0bf':'var(--muted)')+'">'+(live?(EN()?'● LIVE':'● ສົດ'):(EN()?'snapshot':'ສະບັບສຳຮອງ'))+'</b> — '+(EN()?'Source: Google Sheet ':'ແຫຼ່ງ: Google Sheet ')+'<b>Data Report Go+</b> · '+(EN()?'tab ':'ແທັບ ')+'<b>Project_Plan</b>'+(live?'':(done?(EN()?' (not imported yet — embedded copy)':' (ຍັງບໍ່ໄດ້ນຳເຂົ້າ — ສະບັບຝັງ)'):(EN()?' · loading…':' · ກຳລັງໂຫຼດ…')));
