@@ -290,6 +290,16 @@
   <div class="note" id="boNote"></div>
 </div>
 
+<!-- PROJECTS -->
+<div class="pane" id="pane-projects">
+  <div class="panel" style="margin-bottom:13px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 18px">
+    <span style="font-size:13px;color:var(--muted)">ໂຄງການ Go+ · ສະຖານະ ແລະ ຄວາມຄືບໜ້າ</span>
+    <span style="font-size:11.5px;color:var(--muted);margin-left:auto" id="projCount"></span>
+  </div>
+  <div id="projectsList"></div>
+  <div class="note" id="projectsNote"></div>
+</div>
+
 <!-- FINANCIAL (draft) -->
 <div class="pane" id="pane-financial">
   <div class="draftbar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg><span><b data-i18n="รอจัดทำ (ร่าง)">รอจัดทำ (ร่าง)</b> — <span data-i18n="รายงานทางการเงิน">รายงานทางการเงิน</span> · P&L · BS · CF (<span data-i18n="ตัวเลขจริงบางส่วน">ตัวเลขจริงบางส่วน · รอจัดทำงบเต็มจากบัญชี</span>)</span></div>
@@ -632,7 +642,7 @@ function applyLang(){
   document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("on",b.dataset.lang===LANG));
   drawn={lab:0,del:0,kit:0,mart:0};
   renderAll(curData);
-  const act=document.querySelector(".tab.active");if(act){const id=act.dataset.tab;if(id==="lab")drawLab();if(id==="delivery"){drawn.del=1;drawDraft("DELIVERY","d_tgt","d_launch","delChart","delChart","#FFCE00");}if(id==="kitchen"){drawn.kit=1;drawDraft("KITCHE+kiosk","kc_tgt","kc_launch","kitChart","kitChart","#FF7A6B");}if(id==="goals")renderGoals();if(id==="backoffice")renderBackoffice();if(id==="financial")renderFinancial();if(id==="mart")renderMap();if(id==="customer")renderCustomer();}
+  const act=document.querySelector(".tab.active");if(act){const id=act.dataset.tab;if(id==="lab")drawLab();if(id==="delivery"){drawn.del=1;drawDraft("DELIVERY","d_tgt","d_launch","delChart","delChart","#FFCE00");}if(id==="kitchen"){drawn.kit=1;drawDraft("KITCHE+kiosk","kc_tgt","kc_launch","kitChart","kitChart","#FF7A6B");}if(id==="goals")renderGoals();if(id==="backoffice")renderBackoffice();if(id==="financial")renderFinancial();if(id==="mart")renderMap();if(id==="customer")renderCustomer();if(id==="projects"&&window.renderProjects)renderProjects();}
   setStatus(curIsLive);
 }
 function setLang(l){LANG=l;applyLang();}
@@ -651,6 +661,7 @@ document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
   if(id==="financial")renderFinancial();
   if(id==="mart"){setTimeout(renderMartHourPay,200);setTimeout(renderMap,1600);}
   if(id==="customer")renderCustomer();
+  if(id==="projects"&&window.renderProjects)renderProjects();
   [revChart,buChart,martRevChart,catChart,labChart,delChart,kitChart].forEach(c=>{try{c&&c.resize();}catch(e){}});
 });
 document.querySelectorAll("#seg-ov button").forEach(b=>b.onclick=()=>setOvGran(b.dataset.g));
@@ -998,6 +1009,39 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
     var live=window._goalsLive,done=window._goalsDone;
     document.getElementById('goalsNote').innerHTML='<b style="color:'+(live?'#7df0bf':'var(--muted)')+'">'+(live?(EN()?'● LIVE':'● ສົດ'):(EN()?'snapshot':'ສະບັບສຳຮອງ'))+'</b> — '+(EN()?'Source: Google Sheet ':'ແຫຼ່ງ: Google Sheet ')+'<b>Data Report Go+</b> · '+(EN()?'tab ':'ແທັບ ')+'<b>Action_Goals</b>'+(live?'':(done?(EN()?' (live fetch failed — embedded copy)':' (ດຶງສົດບໍ່ໄດ້ — ສະບັບຝັງ)'):(EN()?' · loading…':' · ກຳລັງໂຫຼດ…')));
   };
+
+  /* ---------- Projects tab — LIVE from Sheet "Project_Plan" (Data Report Go+) ---------- */
+  EMBED.projects=[];
+  function projColor(s){s=String(s);if(s.indexOf('ໃຊ້ຈິງ')>=0||s.toLowerCase().indexOf('live')>=0)return TEAL;if(s.indexOf('ທົດລອງ')>=0||s.toLowerCase().indexOf('pilot')>=0)return YEL;if(s.indexOf('ວາງແຜນ')>=0||s.toLowerCase().indexOf('plan')>=0)return GREY;if(s.indexOf('ພັກ')>=0)return RED;return GREEN;}
+  function loadProjectsLive(){
+    gvizQuery("Project_Plan","SELECT * LIMIT 100",function(rows){
+      var ok=rows&&rows.length>0&&rows.length<=40&&/[຀-໿]/.test(String((rows[0]||[])[3]||''));
+      if(ok){var out=[];
+        rows.forEach(function(r){if(!r[0]||!String(r[0]).trim())return;
+          out.push({name:String(r[0]||'').trim(),cat:String(r[1]||'').trim(),obj:String(r[2]||'').trim(),status:String(r[3]||'').trim(),phase:String(r[4]||'').trim(),progress:Math.round(+(String(r[5]||'0').replace(/[^0-9.]/g,''))||0),next:String(r[6]||'').trim(),owner:String(r[7]||'').trim(),target:String(r[8]||'').trim(),priority:String(r[9]||'').trim(),note:String(r[10]||'').trim()});});
+        if(out.length){EMBED.projects=out;window._projLive=true;}
+      }
+      window._projDone=true;paintProjects();
+    });
+  }
+  function paintProjects(){
+    var ps=EMBED.projects||[];
+    document.getElementById('projCount').textContent=ps.length+' '+(EN()?'projects':'ໂຄງການ');
+    document.getElementById('projectsList').innerHTML=ps.map(function(p){
+      var sc=projColor(p.status),pu=String(p.priority||'').toUpperCase(),pr=(pu.indexOf('P1')>=0?'p1':pu.indexOf('P3')>=0?'p3':'p2');
+      var steps=p.next?String(p.next).split(/\s+·\s+/).map(function(s){return s.trim();}).filter(Boolean):[];
+      var nx=steps.length?'<div class="gsub"><div class="gsubh">'+SVG.flag(11)+' '+(EN()?'Next':'ກ້າວຕໍ່ໄປ')+'</div>'+steps.map(function(s){return '<div class="gsubi">• '+s+'</div>';}).join('')+'</div>':'';
+      return '<div class="goal gcard"><span class="gbu" style="background:'+sc+'22;color:'+sc+'">'+(p.cat||'')+'</span>'
+        +'<div class="ginfo"><div class="gbadges">'+(p.priority?'<span class="gtag '+pr+'">'+SVG.flag(11)+' '+p.priority+'</span>':'')+'<span class="gtag" style="background:'+sc+'22;color:'+sc+'">'+(p.status||'')+'</span>'+(p.phase?'<span class="gtag theme">'+p.phase+'</span>':'')+'</div>'
+        +'<div class="gtitle">'+(p.name||'')+'</div>'
+        +'<div class="gmeta">'+(p.obj?'<div class="row"><span class="ic">'+SVG.target(13)+'</span><span>'+p.obj+'</span></div>':'')+((p.owner||p.target)?'<div class="row"><span class="ic">'+SVG.user(13)+'</span><span>'+[p.owner,p.target].filter(Boolean).join(' · ')+'</span></div>':'')+'</div>'+nx+'</div>'
+        +'<div class="gkpi">'+(p.note?'<span class="ic">'+SVG.box(13)+'</span>'+p.note:'')+'</div>'
+        +'<div class="gprog"><div class="gpt"><span>'+t('ความคืบหน้า')+'</span><b>'+p.progress+'%</b></div><div class="gprogbar"><i style="width:'+p.progress+'%;background:'+sc+'"></i></div></div></div>';
+    }).join('')||'<div class="note">—</div>';
+    var live=window._projLive,done=window._projDone;
+    document.getElementById('projectsNote').innerHTML='<b style="color:'+(live?'#7df0bf':'var(--muted)')+'">'+(live?(EN()?'● LIVE':'● ສົດ'):(EN()?'snapshot':'ສະບັບສຳຮອງ'))+'</b> — '+(EN()?'Source: Google Sheet ':'ແຫຼ່ງ: Google Sheet ')+'<b>Data Report Go+</b> · '+(EN()?'tab ':'ແທັບ ')+'<b>Project_Plan</b>'+(live?'':(done?(EN()?' (not imported yet — embedded copy)':' (ຍັງບໍ່ໄດ້ນຳເຂົ້າ — ສະບັບຝັງ)'):(EN()?' · loading…':' · ກຳລັງໂຫຼດ…')));
+  }
+  window.renderProjects=function(){if(!window._projFetched){window._projFetched=true;loadProjectsLive();}paintProjects();};
 
   /* if financial/goals tab already active on load, re-render with new versions */
   var act=document.querySelector('.tab.active');
