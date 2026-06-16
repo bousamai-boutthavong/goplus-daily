@@ -447,7 +447,7 @@ function renderMart(d){
   m_sku.textContent=fmtN(M.skus);m_qty.textContent=fmtN(M.qty);m_brnow.textContent=P.now;m_breoy.textContent=P.eoy;
   const cs=EMBED.cust&&EMBED.cust.summary;if(cs){ms_total.textContent=fmtN(cs.total);ms_repeat.textContent=fmtN(cs.repeat)+" ("+cs.repeatPct+"%)";ms_pts.textContent=fmtN(cs.totalPoints);}
   m_brplan.textContent=P.launches.length?(t("เปิดเพิ่ม")+": "+P.launches.map(l=>l.b+" ("+l.m+")").join(" · ")):t("คงที่");
-  promoAlert.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-1px"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> <b>${t("จุดที่ต้องดู")}:</b> Promotion — ${t("ขายต่ำกว่าทุน")} <b>−${fmtM(Math.abs(EMBED.promoLoss))} ລ້ານ</b>`;
+  promoAlert.innerHTML='';promoAlert.style.display='none';
   martNote.innerHTML=`${t("วิเคราะห์จาก")} <b>${fmtN(EMBED.range.skus)} SKU</b> · ${EMBED.range.from} – ${EMBED.range.to} (${EMBED.range.days} ${t("วัน")}) · Go+ Mart POS`;
   if(!drawn.mart){drawn.mart=1;setMartGran(martGran);setCatMetric(catMetric);setProdMetric(prodMetric);setTimeout(renderMartHourPay,200);setTimeout(renderMap,1600);}
   renderMartBranch();
@@ -757,6 +757,11 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
 .goal.gcard .gmeta{margin:0 0 2px;gap:5px;font-size:12px}
 .goal.gcard .gmeta .row{align-items:flex-start;line-height:1.45}
 .goal.gcard .gprogbar{margin-top:12px;height:6px}
+/* ---- sticky tab menu + per-BU theme accent (2026-06-16) ---- */
+.tabs{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:2px solid var(--bu,var(--line))!important;box-shadow:0 7px 14px -10px rgba(0,0,0,.65)}
+.tab.active{color:#fff!important;border-bottom-color:var(--bu,var(--teal))!important}
+.tab.active::after{content:"";position:absolute;left:9px;right:9px;bottom:-2px;height:2px;border-radius:2px;background:var(--bu,var(--teal))}
+.tab{position:relative}
 /* ---- mobile polish (phone · WhatsApp/mobile browser) ---- */
 @media(max-width:600px){
   /* tabs: single swipeable row instead of wrapping into many rows */
@@ -1063,6 +1068,10 @@ applyLang();setStatus(false);document.getElementById("statustxt").textContent=t(
   /* if financial/goals tab already active on load, re-render with new versions */
   var act=document.querySelector('.tab.active');
   if(act){var id=act.dataset.tab;if(id==='financial')window.renderFinancial();if(id==='goals'&&document.getElementById('goalBU'))window.drawGoals();}
+  /* per-BU theme accent: tab underline + tab-strip border follow the active BU brand color */
+  function setBuTheme(tid){var c={overview:'#16b894',mart:'#16b894',lab:'#5BA3F5',delivery:'#2bd98f',kitchen:'#FF7A6B'}[tid]||'#16b894';document.documentElement.style.setProperty('--bu',c);}
+  document.querySelectorAll('.tab').forEach(function(tb){tb.addEventListener('click',function(){setBuTheme(tb.dataset.tab);});});
+  setBuTheme(act?act.dataset.tab:'overview');
 })();
 </script>
 </body>
