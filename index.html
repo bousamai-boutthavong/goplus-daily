@@ -894,7 +894,7 @@ function ldRangeInit(){var fI=document.getElementById('ldFrom'),tI=document.getE
   tI.addEventListener('change',function(){LD_RANGE.to=tI.value||null;custom();});
   document.querySelectorAll('#ldRange .lr-presets button').forEach(function(b){b.onclick=function(){ldSetPreset(b.dataset.p);};});}
 var _ldApplyLang=applyLang;applyLang=function(){_ldApplyLang.apply(this,arguments);renderLatestDay();};
-applyLang();setStatus(false);document.getElementById("statustxt").textContent=t("กำลังโหลดข้อมูลสด…");renderAll(EMBED);setStatus(false);try{var _u=document.getElementById('updated');if(_u)_u.textContent='snapshot 2026-06-28 (eod)';}catch(e){}
+applyLang();setStatus(false);document.getElementById("statustxt").textContent=t("กำลังโหลดข้อมูลสด…");renderAll(EMBED);setStatus(false);try{var _u=document.getElementById('updated');if(_u)_u.textContent='snapshot 2026-06-29 (midday)';}catch(e){}
 </script>
 <style>
 /* ===== Go+ Dashboard upgrade · financial drill-down + comparison + BS proportion (2026-06-15 · Erwin) ===== */
